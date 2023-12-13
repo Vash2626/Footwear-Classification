@@ -1,45 +1,19 @@
-document.getElementById('predictButton').addEventListener('click', predict);
+import * as tf from '@tensorflow/tfjs';
 
-async function predict() {
-    const input = document.getElementById('inputImage').files[0];
-
-    if (!input) {
-        alert('Please select an image.');
-        return;
-    }
-
-    const session = new onnx.InferenceSession();
-    await session.loadModel('mymodel.onnx'); 
-
-    const tensor = new onnx.Tensor(new Float32Array(3 * 224 * 224), 'float32', [1, 3, 224, 224]);
-    const imageData = getImageData(input);
-    tensor.data.set(imageData);
-
-    const inputMap = {};
-    inputMap[session.inputNames[0]] = tensor;
-    const outputMap = await session.run(inputMap);
-    
-    const predictions = outputMap.values().next().value.data;
-
-    document.getElementById('predictionResult').innerText = `Predictions: ${predictions}`;
+async function loadModel() {
+ const modelUrl = 'mymodel.onnx';
+ const model = await tf.loadGraphModel(modelUrl);
+ return model;
 }
 
-function getImageData(file) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            const image = new Image();
-            image.src = event.target.result;
-            image.onload = function () {
-                const canvas = document.createElement('canvas');
-                canvas.width = 224;
-                canvas.height = 224;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(image, 0, 0, 224, 224);
-                const imageData = ctx.getImageData(0, 0, 224, 224).data;
-                resolve(Array.from(imageData));
-            };
-        };
-        reader.readAsDataURL(file);
-    });
+async function runModel(model, inputTensor) {
+ const outputTensor = await model.execute(inputTensor);
+ return outputTensor;
 }
+
+(async function main() {
+ const model = await loadModel();
+ const inputTensor = tf.tensor(Float32Array.from([/* your input data */]), [1, 3, 60, 60]); // or your model's expected input size
+ const outputTensor = await runModel(model, inputTensor);
+ console.log('Model output:', outputTensor.dataSync());
+})();
