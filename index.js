@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 
 async function loadModel() {
- const modelUrl = 'mymodel.onnx';
+ const modelUrl = 'Users/VASHIST/OneDrive/Desktop/MyProject/mymodel.onnx';
  const model = await tf.loadGraphModel(modelUrl);
  return model;
 }
