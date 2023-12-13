@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ONNX Model Deployment</title>
+</head>
+<body>
+    <h1>ONNX Model Deployment</h1>
+    
+    <!-- Input to upload an image -->
+    <input type="file" id="inputImage">
+    <button onclick="predict()">Predict</button>
+
+    <!-- Section to display predictions -->
+    <div id="predictionResult"></div>
+
+    <script>
+        function predict() {
+            var input = document.getElementById('inputImage').files[0];
+            var formData = new FormData();
+            formData.append('file', input);
+
+            // Send image file to a server for prediction
+            fetch('YOUR_SERVER_ENDPOINT', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('predictionResult').innerText = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
